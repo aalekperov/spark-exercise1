@@ -1,11 +1,11 @@
-#Spark Application for training
+# Spark Application for training
 
-##Requrements
+## Requrements
 * Apache Spark v3
 * Apache Maven v3
 * Scala 2.12 
 
-##How to run the project
+## How to run the project
 * To build the project run the next command from root directory: `mvn clean package` 
 * To run spark application run the next script from root directory: `./run.sh`
 
