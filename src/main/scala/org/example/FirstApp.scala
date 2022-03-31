@@ -12,6 +12,10 @@ object FirstApp {
     .appName("First Application")
     .getOrCreate()
 
+  val averageCol = "average"
+  val averageRatingCol = "average_rating"
+  val rangeCol = "range"
+  val countCol = "count"
 
   def main(args: Array[String]) : Unit = {
     val data = readCsvFile(args(0))
@@ -41,32 +45,32 @@ object FirstApp {
   }
 
   def ratingMoreThan(data: DataFrame, rating: Double): Dataset[Row] = {
-    Validate.isTrue(data.columns.contains("average_rating"))
+    Validate.isTrue(data.columns.contains(averageRatingCol))
     data
-      .filter(row => row.getAs[String]("average_rating").toDouble > rating)
+      .filter(row => row.getAs[String](averageRatingCol).toDouble > rating)
   }
 
   def averageRating(data: DataFrame): DataFrame = {
-    Validate.isTrue(data.columns.contains("average_rating"))
+    Validate.isTrue(data.columns.contains(averageRatingCol))
     data
-      .select(col("average_rating")
+      .select(col(averageRatingCol)
         .cast(DoubleType)
-        .as("average_rating"))
-      .agg(round(avg("average_rating"), 2)
-        .as("average"))
+        .as(averageRatingCol))
+      .agg(round(avg(averageRatingCol), 2)
+        .as(averageCol))
   }
 
   def booksCountInRange(data: DataFrame, ranges: List[(Int, Int)]): DataFrame = {
-    Validate.isTrue(data.columns.contains("average_rating"))
+    Validate.isTrue(data.columns.contains(averageRatingCol))
     ranges.foreach(range => Validate.isTrue(range._1 <= range._2))
-    def df(lowBound: Int, upperBound: Int) = {
+    def df(lowBound: Int, upperBound: Int): DataFrame = {
       data
-      .select(col("average_rating").cast(DoubleType))
-      .where(col("average_rating")
+      .select(col(averageRatingCol).cast(DoubleType))
+      .where(col(averageRatingCol)
         .between(lowBound, upperBound))
       .agg(count("*").as("count"))
-      .withColumn("range", lit(s"${lowBound.toString} - ${upperBound.toString}"))
-      .select(col("range"), col("count"))
+      .withColumn(rangeCol, lit(s"${lowBound.toString} - ${upperBound.toString}"))
+      .select(col(rangeCol), col(countCol))
     }
 
     ranges.map(range => df(range._1, range._2)).reduce(_ union _)
