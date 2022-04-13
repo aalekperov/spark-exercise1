@@ -1,4 +1,4 @@
-# Spark Application for training
+# Spark Application 
 
 ## Requrements
 * Apache Spark v3
